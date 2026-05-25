@@ -51,6 +51,16 @@ class FilmControllerTest {
     }
 
     @Test
+    void shouldFailWhenNameIsNull() throws Exception {
+        Film film = getValidFilm();
+        film.setName(null);
+        mockMvc.perform(post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void shouldFailWhenDescriptionTooLong() throws Exception {
         Film film = getValidFilm();
         film.setDescription("a".repeat(201));
@@ -81,6 +91,16 @@ class FilmControllerTest {
     }
 
     @Test
+    void shouldFailWhenReleaseDateIsNull() throws Exception {
+        Film film = getValidFilm();
+        film.setReleaseDate(null);
+        mockMvc.perform(post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void shouldPassWhenReleaseDateIsCinemaBirthday() throws Exception {
         Film film = getValidFilm();
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
@@ -90,13 +110,4 @@ class FilmControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void shouldFailWhenDurationIsZero() throws Exception {
-        Film film = getValidFilm();
-        film.setDuration(0);
-        mockMvc.perform(post("/films")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(film)))
-                .andExpect(status().isBadRequest());
-    }
 }

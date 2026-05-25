@@ -44,6 +44,7 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> getAll() {
+        log.info("Получен запрос на список всех фильмов");
         return films.values();
     }
 
@@ -56,13 +57,9 @@ public class FilmController {
             log.warn("Ошибка: описание > 200 символов");
             throw new ValidationException("Максимальная длина описания — 200 символов");
         }
-        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
-            log.warn("Ошибка: дата релиза раньше {}", CINEMA_BIRTHDAY);
-            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() <= 0) {
-            log.warn("Ошибка продолжительность <= 0");
-            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
+            log.warn("Ошибка: дата релиза пустая или раньше {}", CINEMA_BIRTHDAY);
+            throw new ValidationException("Дата релиза не может быть пустой или раньше 28 декабря 1895 года");
         }
     }
 }

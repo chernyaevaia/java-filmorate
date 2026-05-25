@@ -23,12 +23,10 @@ public class UserController {
     @PostMapping
     public User create(@RequestBody User user) {
         validate(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        setNameIfBlank(user);
         user.setId(nextId++);
         users.put(user.getId(), user);
-        log.info("Создан пользователь: {}", user.getLogin());
+        log.info("Добавлен пользователь: {}", user.getLogin());
         return user;
     }
 
@@ -39,9 +37,7 @@ public class UserController {
             throw new NotFoundException("Пользователь с id=" + user.getId() + " не найден");
         }
         validate(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        setNameIfBlank(user);
         users.put(user.getId(), user);
         log.info("Обновлён пользователь: {}", user.getLogin());
         return user;
@@ -49,7 +45,14 @@ public class UserController {
 
     @GetMapping
     public Collection<User> getAll() {
+        log.info("Получен запрос на список всех пользователей");
         return users.values();
+    }
+
+    private void setNameIfBlank(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 
     private void validate(User user) {
@@ -61,9 +64,9 @@ public class UserController {
             log.warn("Ошибка: неверный логин");
             throw new ValidationException("Логин не может быть пустым и содержать пробелы");
         }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            log.warn("Ошибка: дата рождения в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
+        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
+            log.warn("Ошибка: дата рождения пустая или в будущем");
+            throw new ValidationException("Дата рождения должна быть заполнена и не может быть в будущем");
         }
     }
 }

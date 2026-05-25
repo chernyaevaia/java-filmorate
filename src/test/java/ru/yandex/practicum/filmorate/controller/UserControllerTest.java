@@ -71,6 +71,16 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldFailWhenBirthdayIsNull() throws Exception {
+        User user = getValidUser();
+        user.setBirthday(null);
+        mockMvc.perform(post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void shouldUseLoginWhenNameIsBlank() throws Exception {
         User user = getValidUser();
         user.setName("   ");
