@@ -110,4 +110,23 @@ class FilmControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void shouldFailWhenDurationIsZero() throws Exception {
+        Film film = getValidFilm();
+        film.setDuration(0);
+        mockMvc.perform(post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldFailWhenDurationIsNegative() throws Exception {
+        Film film = getValidFilm();
+        film.setDuration(-1);
+        mockMvc.perform(post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(film)))
+                .andExpect(status().isBadRequest());
+    }
 }

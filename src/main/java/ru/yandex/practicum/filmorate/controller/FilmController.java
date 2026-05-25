@@ -61,5 +61,9 @@ public class FilmController {
             log.warn("Ошибка: дата релиза пустая или раньше {}", CINEMA_BIRTHDAY);
             throw new ValidationException("Дата релиза не может быть пустой или раньше 28 декабря 1895 года");
         }
+        if (film.getDuration() <= 0) {
+            log.warn("Ошибка продолжительность <= 0");
+            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+        }
     }
 }
