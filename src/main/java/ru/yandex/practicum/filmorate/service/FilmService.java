@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage; 
+    private final UserStorage userStorage;
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
@@ -24,16 +24,16 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        filmStorage.getById(filmId);  
-        userStorage.getById(userId);   
+        filmStorage.getById(filmId);
+        userStorage.getById(userId);
         Film film = filmStorage.getById(filmId);
         film.getLikes().add((long) userId);
         log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
     }
 
     public void removeLike(int filmId, int userId) {
-        filmStorage.getById(filmId);   
-        userStorage.getById(userId);   
+        filmStorage.getById(filmId);
+        userStorage.getById(userId);
         Film film = filmStorage.getById(filmId);
         film.getLikes().remove((long) userId);
         log.info("Пользователь {} удалил лайк у фильма {}", userId, filmId);
