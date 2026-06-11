@@ -4,12 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -22,8 +26,12 @@ class FilmControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private FilmService filmService;
+
     private Film getValidFilm() {
         Film film = new Film();
+        film.setId(1);
         film.setName("Test");
         film.setDescription("Desc");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
@@ -33,6 +41,8 @@ class FilmControllerTest {
 
     @Test
     void shouldCreateValidFilm() throws Exception {
+        when(filmService.create(any())).thenReturn(getValidFilm());
+
         mockMvc.perform(post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(getValidFilm())))
@@ -74,6 +84,8 @@ class FilmControllerTest {
     void shouldPassWhenDescriptionExactly200() throws Exception {
         Film film = getValidFilm();
         film.setDescription("a".repeat(200));
+        when(filmService.create(any())).thenReturn(film);
+
         mockMvc.perform(post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(film)))
@@ -104,6 +116,8 @@ class FilmControllerTest {
     void shouldPassWhenReleaseDateIsCinemaBirthday() throws Exception {
         Film film = getValidFilm();
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
+        when(filmService.create(any())).thenReturn(film);
+
         mockMvc.perform(post("/films")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(film)))
