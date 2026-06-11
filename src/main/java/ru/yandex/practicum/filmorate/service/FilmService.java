@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -23,22 +24,23 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        getFilmOrThrow(filmId);
-        getUserOrThrow(userId);
         Film film = getFilmOrThrow(filmId);
+        getUserOrThrow(userId);
         film.getLikes().add(userId);
         log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
     }
 
     public void removeLike(int filmId, int userId) {
-        getFilmOrThrow(filmId);
-        getUserOrThrow(userId);
         Film film = getFilmOrThrow(filmId);
+        getUserOrThrow(userId);
         film.getLikes().remove(userId);
         log.info("Пользователь {} удалил лайк у фильма {}", userId, filmId);
     }
 
     public List<Film> getPopular(int count) {
+        if (count <= 0) {
+            throw new ValidationException("Count must be positive");
+        }
         return filmStorage.getPopular(count);
     }
 
@@ -61,11 +63,11 @@ public class FilmService {
 
     private Film getFilmOrThrow(int id) {
         return filmStorage.getById(id)
-                .orElseThrow(() -> new NotFoundException("Фильм с id=" + id + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Film with id=" + id + " not found"));
     }
 
     private void getUserOrThrow(int id) {
         userStorage.getById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + id + " не найден"));
+                .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
 }
