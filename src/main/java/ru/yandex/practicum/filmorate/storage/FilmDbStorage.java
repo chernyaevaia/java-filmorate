@@ -117,12 +117,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void addLike(int filmId, int userId) {
-        try {
-            jdbcTemplate.update(
-                    "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)",
-                    filmId, userId);
-        } catch (DuplicateKeyException e) {
-        }
+        jdbcTemplate.update(
+                "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)",
+                filmId, userId);
     }
 
     @Override

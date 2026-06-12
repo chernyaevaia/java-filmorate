@@ -89,12 +89,9 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void addFriend(int userId, int friendId) {
-        try {
             jdbcTemplate.update(
                     "INSERT INTO friendships (user_id, friend_id) VALUES (?, ?)",
                     userId, friendId);
-        } catch (DuplicateKeyException e) {
-        }
     }
 
     @Override
