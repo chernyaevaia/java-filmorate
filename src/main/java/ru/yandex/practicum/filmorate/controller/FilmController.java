@@ -1,12 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
+import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,10 +13,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+
     private final FilmService filmService;
     private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 
-    @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
@@ -30,6 +29,9 @@ public class FilmController {
 
     @PutMapping
     public Film update(@RequestBody Film film) {
+        if (film.getId() == 0) {
+            throw new ValidationException("Film id must be specified for update");
+        }
         validate(film);
         return filmService.update(film);
     }
@@ -45,11 +47,13 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addLike(@PathVariable int id, @PathVariable int userId) {
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeLike(@PathVariable int id, @PathVariable int userId) {
         filmService.removeLike(id, userId);
     }
@@ -61,16 +65,16 @@ public class FilmController {
 
     private void validate(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            throw new ValidationException("Название фильма не может быть пустым");
+            throw new ValidationException("Film name cannot be empty");
         }
         if (film.getDescription() != null && film.getDescription().length() > 200) {
-            throw new ValidationException("Максимальная длина описания — 200 символов");
+            throw new ValidationException("Description max length is 200 characters");
         }
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
-            throw new ValidationException("Дата релиза не может быть пустой или раньше 28 декабря 1895 года");
+            throw new ValidationException("Release date cannot be before 1895-12-28");
         }
         if (film.getDuration() <= 0) {
-            throw new ValidationException("Продолжительность фильма должна быть положительным числом");
+            throw new ValidationException("Duration must be positive");
         }
     }
 }
