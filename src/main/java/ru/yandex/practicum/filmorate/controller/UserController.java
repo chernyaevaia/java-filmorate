@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-
+import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,6 +29,9 @@ public class UserController {
 
     @PutMapping
     public User update(@RequestBody User user) {
+        if (user.getId() == 0) {
+            throw new ValidationException("User id must be specified for update");
+        }
         validate(user);
         setNameIfBlank(user);
         return userService.update(user);
@@ -45,11 +48,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addFriend(@PathVariable int id, @PathVariable int friendId) {
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
         userService.removeFriend(id, friendId);
     }
@@ -72,13 +77,13 @@ public class UserController {
 
     private void validate(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            throw new ValidationException(" Электронная почта не может быть пустой и должна содержать @");
+            throw new ValidationException("Email must contain @");
         }
         if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
+            throw new ValidationException("Login cannot be empty or contain spaces");
         }
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Дата рождения должна быть заполнена и не может быть в будущем");
+            throw new ValidationException("Birthday cannot be in the future");
         }
     }
 }

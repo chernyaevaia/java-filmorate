@@ -1,12 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
+import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,7 +22,6 @@ public class FilmController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public Film create(@RequestBody Film film) {
         validate(film);
         return filmService.create(film);
